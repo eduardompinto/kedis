@@ -3,6 +3,6 @@ fun main() {
         val key = "key"
         val value = "value"
         println(cli.set(key, value))
-        println(cli.get(key))
+        print(cli.get(key))
     }
 }

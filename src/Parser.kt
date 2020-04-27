@@ -22,23 +22,15 @@ data class Response(
 }
 
 
-private fun getParser(msgType: Char): (msg: String) -> Response = when (msgType) {
-    '+' -> { msg: String ->
-        Response(text = msg.trim())
+fun parse(msg: String): Response {
+    val msgType = msg[0]
+    val msgBody = msg.substring(1)
+    return when (msgType) {
+        '+' -> Response(text = msgBody.trim())
+        ':' -> Response(integer = msgBody.toInt())
+        '-' -> Response(errorCode = msgBody.substring(0, 1), text = msgBody.substring(1))
+        '$' -> Response(text = msgBody.substring(1))
+        else -> throw RuntimeException("Invalid Response [$msg]")
     }
-    ':' -> { msg: String ->
-        Response(integer = msg.toInt())
-    }
-    '-' -> { msg: String ->
-        Response(errorCode = msg.substring(0, 1), text = msg.substring(1))
-    }
-    '$' -> { msg: String ->
-        Response(text = msg.substring(1))
-    }
-    else -> throw RuntimeException("Invalid Response :(")
 }
 
-fun parse(msg: String): Response {
-    val parser = getParser(msg[0])
-    return parser.invoke(msg.substring(1))
-}
