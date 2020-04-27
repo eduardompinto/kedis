@@ -24,9 +24,7 @@ data class Response(
     val text: String? = null,
     val integer: Int? = null,
     val errorCode: String? = null
-) {
-    val success = errorCode == null
-}
+)
 
 fun parse(msg: String): Response {
     val msgType = msg[0]
@@ -34,7 +32,10 @@ fun parse(msg: String): Response {
 
     return when (msgType) {
         ARRAYS -> throw NotImplementedError("No implementation found for arrays msg type")
-        BULK_STRINGS -> Response(text = msgBody.substring(1))
+        BULK_STRINGS -> when {
+            msgBody.substring(0, 2) == "-1" -> Response()
+            else -> Response(text = msgBody.substring(1))
+        }
         ERRORS -> Response(errorCode = msgBody.substring(0, 1), text = msgBody.substring(1))
         INTEGERS -> Response(integer = msgBody.toInt())
         SIMPLE_STRINGS -> Response(text = msgBody.trim())
